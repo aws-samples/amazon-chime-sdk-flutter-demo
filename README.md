@@ -24,5 +24,6 @@ Update `apiUrl` and `region` in `lib/api_config.dart` with the server URL and re
 Run `flutter run` to start the demo under the root directory.
 ## 5. Cleanup
 If you no longer want to keep the demo active in your AWS account and want to avoid incurring AWS charges, the demo resources can be removed. Delete the two AWS CloudFormation (https://aws.amazon.com/cloudformation/) stacks created in the prerequisites that can be found in the AWS CloudFormation console (https://console.aws.amazon.com/cloudformation/home).
+
 ​
 **Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.**
