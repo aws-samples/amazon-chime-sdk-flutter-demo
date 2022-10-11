@@ -20,8 +20,18 @@ Follow the instructions in [amazon-chime-sdk-js](https://github.com/aws/amazon-c
 
 ## 3. Update the server URLs
 Update `apiUrl` and `region` in `lib/api_config.dart` with the server URL and region of the serverless demo you created.
+
 ## 4. Build and run
-Run `flutter run` to start the demo under the root directory.
+
+### Android
+* Connect a physical Android testing device (*we currently do not support x86 architecture/simulators*) to your computer
+* Run `flutter run` under the root directory to start the demo app on the device
+
+### iOS
+* Connect a physical iOS testing device or start iOS simulator
+* Run `pod install` under `./ios/` directory to install Chime SDK dependencies
+* Run `flutter run` under the root directory to start the demo app on the device/simulator
+
 ## 5. Cleanup
 If you no longer want to keep the demo active in your AWS account and want to avoid incurring AWS charges, the demo resources can be removed. Delete the two AWS CloudFormation (https://aws.amazon.com/cloudformation/) stacks created in the prerequisites that can be found in the AWS CloudFormation console (https://console.aws.amazon.com/cloudformation/home).
 
