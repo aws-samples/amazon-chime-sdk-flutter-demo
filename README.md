@@ -11,6 +11,27 @@ For more details about the SDK APIs, please refer to the **Getting Started** gui
 ---
 ​
 # How to Run the Flutter Demo Application​
+
+## Prerequisites
+The demo application is able run on both iOS and Android. For managing Amazon Chime SDK as dependency, CocoaPods is utilized on iOS, Maven Central repository with Gradle is utilized on Android. In order to run the demo, make sure the following are installed/prepared:
+
+For both iOS and Android:
+ - Install [Flutter SDK](https://docs.flutter.dev/get-started/install)
+
+For running on iOS:
+ - MacOS is needed
+ - Install [XCode](https://apps.apple.com/us/app/xcode/id497799835?mt=12)
+ - Install [CocoaPods](https://guides.cocoapods.org/using/getting-started.html#getting-started)
+ - If running on simulator, follow this [link](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes) to create iOS Simulators
+ - If running on physical device, Apple Developer [account](https://developer.apple.com/) is needed.
+
+For running on Android:
+ - Install [Android Studio](https://developer.android.com/studio/install)
+ - Install [Gradle](https://gradle.org/install/)
+ - Android physical device is needed (*currently x86 architecture/simulators are not supported*)
+
+> *Note: The demo application is not necessarily running with the latest Amazon Chime SDK, the current SDK version can be found [here](https://github.com/aws-samples/amazon-chime-sdk-flutter-demo/blob/main/ios/Podfile#L8) for iOS and [here](https://github.com/aws-samples/amazon-chime-sdk-flutter-demo/blob/main/android/app/build.gradle#L76-L77) for Android.*
+
 ## 1. Clone the repository
 Run `git clone` to download the source code
 
