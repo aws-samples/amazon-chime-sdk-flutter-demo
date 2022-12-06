@@ -40,7 +40,7 @@ Follow the instructions in [amazon-chime-sdk-js](https://github.com/aws/amazon-c
 > *Note: The Flutter demo doesn’t require authentication since the serverless demo does not provide the functionality, builders need to implement authentication for their own backend service.*
 
 ## 3. Update the server URLs
-Update `apiUrl` and `region` in `lib/api_config.dart` with the server URL and region of the serverless demo you created.
+Update `apiUrl` and `region` in `lib/api_config.dart` with the server URL and region of the serverless demo you created. `apiUrl` format: `https://<api-id>.execute-api.<aws-region-id>.amazonaws.com/Prod/`.
 
 ## 4. Build and run
 
