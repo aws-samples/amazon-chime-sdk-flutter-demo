@@ -1,39 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 /*
  * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT-0
  */
 
-import 'dart:convert';
-import 'package:flutter_demo_chime_sdk/api_config.dart';
-import 'package:http/http.dart' as http;
-
-import 'logger.dart';
-
 class Api {
-  final String _baseUrl = ApiConfig.apiUrl;
-  final String _region = ApiConfig.region;
-
-  Future<ApiResponse?> join(String meetingId, String attendeeId) async {
-    String url = "${_baseUrl}join?title=$meetingId&name=$attendeeId&region=$_region";
-
-    try {
-      final http.Response response = await http.post(Uri.parse(url));
-
-      logger.d("STATUS: ${response.statusCode}");
-
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        logger.i("POST - join api call successful!");
-        Map<String, dynamic> joinInfoMap = jsonDecode(response.body);
-        JoinInfo joinInfo = JoinInfo.fromJson(joinInfoMap);
-        return ApiResponse(response: true, content: joinInfo);
-      }
-    } catch (e) {
-      logger.e("join request Failed. Status: ${e.toString()}");
-      return ApiResponse(response: false, error: e.toString());
-    }
-    return null;
-  }
-
   Map<String, dynamic> joinInfoToJSON(JoinInfo info) {
     Map<String, dynamic> flattenedJSON = {
       "MeetingId": info.meeting.meetingId,
@@ -62,6 +33,9 @@ class JoinInfo {
   factory JoinInfo.fromJson(Map<String, dynamic> json) {
     return JoinInfo(Meeting.fromJson(json), AttendeeInfo.fromJson(json));
   }
+
+  @override
+  String toString() => 'JoinInfo(meeting: $meeting, attendee: $attendee)';
 }
 
 class Meeting {
@@ -70,10 +44,10 @@ class Meeting {
   final String mediaRegion;
   final MediaPlacement mediaPlacement;
 
-  Meeting(this.meetingId, this.externalMeetingId, this.mediaRegion, this.mediaPlacement);
+  Meeting(this.meetingId, this.externalMeetingId, this.mediaRegion,
+      this.mediaPlacement);
 
   factory Meeting.fromJson(Map<String, dynamic> json) {
-    // TODO zmauricv: Look into JSON Serialization Solutions
     var meetingMap = json['JoinInfo']['Meeting']['Meeting'];
 
     return Meeting(
@@ -83,6 +57,11 @@ class Meeting {
       MediaPlacement.fromJson(json),
     );
   }
+
+  @override
+  String toString() {
+    return 'Meeting(meetingId: $meetingId, externalMeetingId: $externalMeetingId, mediaRegion: $mediaRegion, mediaPlacement: $mediaPlacement)';
+  }
 }
 
 class MediaPlacement {
@@ -91,12 +70,18 @@ class MediaPlacement {
   final String signalingUrl;
   final String turnControllerUrl;
 
-  MediaPlacement(this.audioHostUrl, this.audioFallbackUrl, this.signalingUrl, this.turnControllerUrl);
+  MediaPlacement(this.audioHostUrl, this.audioFallbackUrl, this.signalingUrl,
+      this.turnControllerUrl);
 
   factory MediaPlacement.fromJson(Map<String, dynamic> json) {
-    var mediaPlacementMap = json['JoinInfo']['Meeting']['Meeting']['MediaPlacement'];
-    return MediaPlacement(mediaPlacementMap['AudioHostUrl'], mediaPlacementMap['AudioFallbackUrl'],
-        mediaPlacementMap['SignalingUrl'], mediaPlacementMap['TurnControlUrl']);
+    var mediaPlacementMap =
+        json['JoinInfo']['Meeting']['Meeting']['MediaPlacement'];
+    return MediaPlacement(
+      mediaPlacementMap['AudioHostUrl'],
+      mediaPlacementMap['AudioFallbackUrl'],
+      mediaPlacementMap['SignalingUrl'],
+      mediaPlacementMap['TurnControlUrl'],
+    );
   }
 }
 
@@ -110,8 +95,16 @@ class AttendeeInfo {
   factory AttendeeInfo.fromJson(Map<String, dynamic> json) {
     var attendeeMap = json['JoinInfo']['Attendee']['Attendee'];
 
-    return AttendeeInfo(attendeeMap['ExternalUserId'], attendeeMap['AttendeeId'], attendeeMap['JoinToken']);
+    return AttendeeInfo(
+      attendeeMap['ExternalUserId'],
+      attendeeMap['AttendeeId'],
+      attendeeMap['JoinToken'],
+    );
   }
+
+  @override
+  String toString() =>
+      'AttendeeInfo(externalUserId: $externalUserId, attendeeId: $attendeeId, joinToken: $joinToken)';
 }
 
 class ApiResponse {

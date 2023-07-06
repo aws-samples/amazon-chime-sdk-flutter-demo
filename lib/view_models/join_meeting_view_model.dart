@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_chime_sdk/api.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../method_channel_coordinator.dart';
 import '../response_enums.dart';
@@ -22,24 +23,20 @@ class JoinMeetingViewModel extends ChangeNotifier {
   bool error = false;
   String? errorMessage;
 
-  bool verifyParameters(String meetingId, String attendeeName) {
-    if (meetingId.isEmpty || attendeeName.isEmpty) {
-      _createError(Response.empty_parameter);
-      return false;
-    } else if (meetingId.length < 2 || meetingId.length > 64 || attendeeName.length < 2 || attendeeName.length > 64) {
-      _createError(Response.invalid_attendee_or_meeting);
-      return false;
-    }
-    return true;
-  }
-
-  Future<bool> joinMeeting(MeetingViewModel meetingProvider, MethodChannelCoordinator methodChannelProvider, String meetingId,
-      String attendeeName) async {
+  Future<bool> joinMeeting(
+    MeetingViewModel meetingProvider,
+    MethodChannelCoordinator methodChannelProvider,
+  ) async {
+    await dotenv.load(fileName: ".env");
     logger.i("Joining Meeting...");
     _resetError();
 
-    bool audioPermissions = await _requestAudioPermissions(methodChannelProvider);
-    bool videoPermissions = await _requestVideoPermissions(methodChannelProvider);
+    bool audioPermissions = await _requestAudioPermissions(
+      methodChannelProvider,
+    );
+    bool videoPermissions = await _requestVideoPermissions(
+      methodChannelProvider,
+    );
 
     // Create error messages for incorrect permissions
     if (!_checkPermissions(audioPermissions, videoPermissions)) {
@@ -54,13 +51,32 @@ class JoinMeetingViewModel extends ChangeNotifier {
     }
 
     // Make call to api and recieve info in ApiResponse format
-    final ApiResponse? apiResponse = await api.join(meetingId, attendeeName);
+    final joinInfo = JoinInfo(
+      Meeting(
+        dotenv.get('MEETING_ID'),
+        dotenv.get('EXTERNAL_MEETING_ID'),
+        dotenv.get('MEDIA_REGION'),
+        MediaPlacement(
+          dotenv.get('AUDIO_HOST_URL'),
+          dotenv.get('AUDIO_FALLBACK_URL'),
+          dotenv.get('SIGNALING_URL'),
+          dotenv.get('TURN_CONTROLLER_URL'),
+        ),
+      ),
+      AttendeeInfo(
+        dotenv.get('EXTERNAL_USER_ID'),
+        dotenv.get('ATTENDEE_ID'),
+        dotenv.get('JOIN_TOKEN'),
+      ),
+    );
+    logger.i(joinInfo);
+    final ApiResponse apiResponse = ApiResponse(
+      response: true,
+      content: joinInfo,
+    );
 
     // Check if ApiResponse is not null or returns a false response value indicating failed api call
-    if (apiResponse == null) {
-      _createError(Response.api_response_null);
-      return false;
-    } else if (!apiResponse.response) {
+    if (!apiResponse.response) {
       if (apiResponse.error != null) {
         _createError(apiResponse.error!);
         return false;
@@ -73,14 +89,18 @@ class JoinMeetingViewModel extends ChangeNotifier {
     }
 
     // Convert JoinInfo object to JSON
-    if (meetingProvider.meetingData == null) {
-      _createError(Response.null_meeting_data);
-      return false;
-    }
-    final Map<String, dynamic> jsonArgsToSend = api.joinInfoToJSON(meetingProvider.meetingData!);
+    // if (meetingProvider.meetingData == null) {
+    //   _createError(Response.null_meeting_data);
+    //   return false;
+    // }
+
+    final Map<String, dynamic> jsonArgsToSend = api.joinInfoToJSON(
+      meetingProvider.meetingData!,
+    );
 
     // Send JSON to iOS
-    MethodChannelResponse? joinResponse = await methodChannelProvider.callMethod(MethodCallOption.join, jsonArgsToSend);
+    MethodChannelResponse? joinResponse = await methodChannelProvider
+        .callMethod(MethodCallOption.join, jsonArgsToSend);
 
     if (joinResponse == null) {
       _createError(Response.null_join_response);
@@ -100,8 +120,10 @@ class JoinMeetingViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> _requestAudioPermissions(MethodChannelCoordinator methodChannelProvider) async {
-    MethodChannelResponse? audioPermission = await methodChannelProvider.callMethod(MethodCallOption.manageAudioPermissions);
+  Future<bool> _requestAudioPermissions(
+      MethodChannelCoordinator methodChannelProvider) async {
+    MethodChannelResponse? audioPermission = await methodChannelProvider
+        .callMethod(MethodCallOption.manageAudioPermissions);
     if (audioPermission == null) {
       return false;
     }
@@ -113,8 +135,10 @@ class JoinMeetingViewModel extends ChangeNotifier {
     return audioPermission.result;
   }
 
-  Future<bool> _requestVideoPermissions(MethodChannelCoordinator methodChannelProvider) async {
-    MethodChannelResponse? videoPermission = await methodChannelProvider.callMethod(MethodCallOption.manageVideoPermissions);
+  Future<bool> _requestVideoPermissions(
+      MethodChannelCoordinator methodChannelProvider) async {
+    MethodChannelResponse? videoPermission = await methodChannelProvider
+        .callMethod(MethodCallOption.manageVideoPermissions);
     if (videoPermission != null) {
       if (videoPermission.result) {
         logger.i(videoPermission.arguments);

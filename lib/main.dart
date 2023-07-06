@@ -8,11 +8,13 @@ import 'package:flutter_demo_chime_sdk/view_models/join_meeting_view_model.dart'
 import 'package:flutter_demo_chime_sdk/view_models/meeting_view_model.dart';
 import 'package:flutter_demo_chime_sdk/views/join_meeting.dart';
 import 'package:flutter_demo_chime_sdk/views/meeting.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'method_channel_coordinator.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: '.env');
   runApp(const MyApp());
 }
 
@@ -41,10 +43,10 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           routes: {
-            '/joinMeeting': (_) => JoinMeetingView(),
+            '/joinMeeting': (_) => const JoinMeetingView(),
             '/meeting': (_) => const MeetingView(),
           },
-          home: JoinMeetingView(),
+          home: const JoinMeetingView(),
         ),
       ),
     );

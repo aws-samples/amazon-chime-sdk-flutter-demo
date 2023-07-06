@@ -13,13 +13,11 @@ import 'package:flutter_demo_chime_sdk/response_enums.dart';
 import 'package:flutter_demo_chime_sdk/video_tile.dart';
 import 'package:flutter_demo_chime_sdk/view_models/meeting_view_model.dart';
 
-import 'attendee.dart';
-import 'interfaces/realtime_interface.dart';
 import 'logger.dart';
-import 'video_tile.dart';
 
 class MethodChannelCoordinator extends ChangeNotifier {
-  final MethodChannel methodChannel = const MethodChannel("com.amazonaws.services.chime.flutterDemo.methodChannel");
+  final MethodChannel methodChannel = const MethodChannel(
+      "com.amazonaws.services.chime.flutterDemo.methodChannel");
 
   RealtimeInterface? realtimeObserver;
   VideoTileInterface? videoTileObserver;
@@ -49,7 +47,8 @@ class MethodChannelCoordinator extends ChangeNotifier {
     logger.d("Observers initialized");
   }
 
-  Future<MethodChannelResponse?> callMethod(String methodName, [dynamic args]) async {
+  Future<MethodChannelResponse?> callMethod(String methodName,
+      [dynamic args]) async {
     logger.d("Calling $methodName through method channel with args: $args");
     try {
       dynamic response = await methodChannel.invokeMethod(methodName, args);
@@ -61,7 +60,8 @@ class MethodChannelCoordinator extends ChangeNotifier {
   }
 
   Future<void> methodCallHandler(MethodCall call) async {
-    logger.d("Recieved method call ${call.method} with arguments: ${call.arguments}");
+    logger.d(
+        "Recieved method call ${call.method} with arguments: ${call.arguments}");
 
     switch (call.method) {
       case MethodCallOption.join:
@@ -98,7 +98,8 @@ class MethodChannelCoordinator extends ChangeNotifier {
         audioVideoObserver?.audioSessionDidStop();
         break;
       default:
-        logger.w("Method ${call.method} with args ${call.arguments} does not exist");
+        logger.w(
+            "Method ${call.method} with args ${call.arguments} does not exist");
     }
   }
 }
