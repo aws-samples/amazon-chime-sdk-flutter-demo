@@ -18,7 +18,11 @@ import '../method_channel_coordinator.dart';
 import '../video_tile.dart';
 
 class MeetingViewModel extends ChangeNotifier
-    implements RealtimeInterface, VideoTileInterface, AudioDevicesInterface, AudioVideoInterface {
+    implements
+        RealtimeInterface,
+        VideoTileInterface,
+        AudioDevicesInterface,
+        AudioVideoInterface {
   String? meetingId;
 
   JoinInfo? meetingData;
@@ -39,7 +43,8 @@ class MeetingViewModel extends ChangeNotifier
   bool isMeetingActive = false;
 
   MeetingViewModel(BuildContext context) {
-    methodChannelProvider = Provider.of<MethodChannelCoordinator>(context, listen: false);
+    methodChannelProvider =
+        Provider.of<MethodChannelCoordinator>(context, listen: false);
   }
 
   //
@@ -64,7 +69,8 @@ class MeetingViewModel extends ChangeNotifier
       logger.e(Response.null_local_attendee);
       return;
     }
-    currAttendees[localAttendeeId!] = Attendee(localAttendeeId!, meetingData!.attendee.externalUserId);
+    currAttendees[localAttendeeId!] =
+        Attendee(localAttendeeId!, meetingData!.attendee.externalUserId);
     notifyListeners();
   }
 
@@ -93,7 +99,8 @@ class MeetingViewModel extends ChangeNotifier
         return;
       }
       currAttendees[remoteAttendeeId!] = attendee;
-      logger.i("${formatExternalUserId(currAttendees[remoteAttendeeId]?.externalUserId)} has joined the meeting.");
+      logger.i(
+          "${formatExternalUserId(currAttendees[remoteAttendeeId]?.externalUserId)} has joined the meeting.");
       notifyListeners();
     }
   }
@@ -104,9 +111,11 @@ class MeetingViewModel extends ChangeNotifier
     final attIdToDelete = attendee.attendeeId;
     currAttendees.remove(attIdToDelete);
     if (didDrop) {
-      logger.i("${formatExternalUserId(attendee.externalUserId)} has dropped from the meeting");
+      logger.i(
+          "${formatExternalUserId(attendee.externalUserId)} has dropped from the meeting");
     } else {
-      logger.i("${formatExternalUserId(attendee.externalUserId)} has left the meeting");
+      logger.i(
+          "${formatExternalUserId(attendee.externalUserId)} has left the meeting");
     }
     notifyListeners();
   }
@@ -147,7 +156,8 @@ class MeetingViewModel extends ChangeNotifier
 
   @override
   Future<void> initialAudioSelection() async {
-    MethodChannelResponse? device = await methodChannelProvider?.callMethod(MethodCallOption.initialAudioSelection);
+    MethodChannelResponse? device = await methodChannelProvider
+        ?.callMethod(MethodCallOption.initialAudioSelection);
     if (device == null) {
       logger.e(Response.null_initial_audio_device);
       return;
@@ -159,7 +169,8 @@ class MeetingViewModel extends ChangeNotifier
 
   @override
   Future<void> listAudioDevices() async {
-    MethodChannelResponse? devices = await methodChannelProvider?.callMethod(MethodCallOption.listAudioDevices);
+    MethodChannelResponse? devices = await methodChannelProvider
+        ?.callMethod(MethodCallOption.listAudioDevices);
 
     if (devices == null) {
       logger.e(Response.null_audio_device_list);
@@ -175,8 +186,12 @@ class MeetingViewModel extends ChangeNotifier
 
   @override
   void updateCurrentDevice(String device) async {
-    MethodChannelResponse? updateDeviceResponse =
-        await methodChannelProvider?.callMethod(MethodCallOption.updateAudioDevice, device);
+    late final MethodChannelResponse? updateDeviceResponse;
+
+    updateDeviceResponse = await methodChannelProvider?.callMethod(
+      MethodCallOption.updateAudioDevice,
+      device,
+    );
 
     if (updateDeviceResponse == null) {
       logger.e(Response.null_audio_device_update);
@@ -206,9 +221,13 @@ class MeetingViewModel extends ChangeNotifier
     final attIdToggleMute = attendee.attendeeId;
     currAttendees[attIdToggleMute]?.muteStatus = mute;
     if (mute) {
-      logger.i("${formatExternalUserId(attendee.externalUserId)} has been muted");
+      logger.i(
+        "${formatExternalUserId(attendee.externalUserId)} has been muted",
+      );
     } else {
-      logger.i("${formatExternalUserId(attendee.externalUserId)} has been unmuted");
+      logger.i(
+        "${formatExternalUserId(attendee.externalUserId)} has been unmuted",
+      );
     }
     notifyListeners();
   }
@@ -220,30 +239,45 @@ class MeetingViewModel extends ChangeNotifier
     }
 
     if (currAttendees[localAttendeeId]!.muteStatus) {
-      MethodChannelResponse? unmuteResponse = await methodChannelProvider?.callMethod(MethodCallOption.unmute);
+      late final MethodChannelResponse? unmuteResponse;
+      unmuteResponse = await methodChannelProvider?.callMethod(
+        MethodCallOption.unmute,
+      );
       if (unmuteResponse == null) {
         logger.e(Response.unmute_response_null);
         return;
       }
 
       if (unmuteResponse.result) {
-        logger.i("${unmuteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}");
+        logger.i(
+          "${unmuteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}",
+        );
         notifyListeners();
       } else {
-        logger.e("${unmuteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}");
+        logger.e(
+          "${unmuteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}",
+        );
       }
     } else {
-      MethodChannelResponse? muteResponse = await methodChannelProvider?.callMethod(MethodCallOption.mute);
+      late final MethodChannelResponse? muteResponse;
+      muteResponse = await methodChannelProvider?.callMethod(
+        MethodCallOption.mute,
+      );
+
       if (muteResponse == null) {
         logger.e(Response.mute_response_null);
         return;
       }
 
       if (muteResponse.result) {
-        logger.i("${muteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}");
+        logger.i(
+          "${muteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}",
+        );
         notifyListeners();
       } else {
-        logger.e("${muteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}");
+        logger.e(
+          "${muteResponse.arguments} ${formatExternalUserId(currAttendees[localAttendeeId]?.externalUserId)}",
+        );
       }
     }
   }
@@ -255,7 +289,8 @@ class MeetingViewModel extends ChangeNotifier
     }
 
     if (currAttendees[localAttendeeId]!.isVideoOn) {
-      MethodChannelResponse? videoStopped = await methodChannelProvider?.callMethod(MethodCallOption.localVideoOff);
+      MethodChannelResponse? videoStopped = await methodChannelProvider
+          ?.callMethod(MethodCallOption.localVideoOff);
       if (videoStopped == null) {
         logger.e(Response.video_stopped_response_null);
         return;
@@ -267,7 +302,8 @@ class MeetingViewModel extends ChangeNotifier
         logger.e(videoStopped.arguments);
       }
     } else {
-      MethodChannelResponse? videoStart = await methodChannelProvider?.callMethod(MethodCallOption.localVideoOn);
+      MethodChannelResponse? videoStart = await methodChannelProvider
+          ?.callMethod(MethodCallOption.localVideoOn);
       if (videoStart == null) {
         logger.e(Response.video_start_response_null);
         return;
@@ -282,7 +318,8 @@ class MeetingViewModel extends ChangeNotifier
   }
 
   void stopMeeting() async {
-    MethodChannelResponse? stopResponse = await methodChannelProvider?.callMethod(MethodCallOption.stop);
+    MethodChannelResponse? stopResponse =
+        await methodChannelProvider?.callMethod(MethodCallOption.stop);
     if (stopResponse == null) {
       logger.e(Response.stop_response_null);
       return;
@@ -314,7 +351,8 @@ class MeetingViewModel extends ChangeNotifier
     if (externalUserIdArray == null) {
       return "UNKNOWN";
     }
-    String extUserId = externalUserIdArray.length == 2 ? externalUserIdArray[1] : "UNKNOWN";
+    String extUserId =
+        externalUserIdArray.length == 2 ? externalUserIdArray[1] : "UNKNOWN";
     return extUserId;
   }
 

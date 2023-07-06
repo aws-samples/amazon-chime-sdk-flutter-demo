@@ -51,56 +51,43 @@ class JoinMeetingViewModel extends ChangeNotifier {
     }
 
     // Make call to api and recieve info in ApiResponse format
-    final joinInfo = JoinInfo(
-      Meeting(
-        dotenv.get('MEETING_ID'),
-        dotenv.get('EXTERNAL_MEETING_ID'),
-        dotenv.get('MEDIA_REGION'),
-        MediaPlacement(
-          dotenv.get('AUDIO_HOST_URL'),
-          dotenv.get('AUDIO_FALLBACK_URL'),
-          dotenv.get('SIGNALING_URL'),
-          dotenv.get('TURN_CONTROLLER_URL'),
-        ),
-      ),
-      AttendeeInfo(
-        dotenv.get('EXTERNAL_USER_ID'),
-        dotenv.get('ATTENDEE_ID'),
-        dotenv.get('JOIN_TOKEN'),
-      ),
-    );
-    logger.i(joinInfo);
     final ApiResponse apiResponse = ApiResponse(
       response: true,
-      content: joinInfo,
+      content: JoinInfo(
+        Meeting(
+          dotenv.get('MEETING_ID'),
+          dotenv.get('EXTERNAL_MEETING_ID'),
+          dotenv.get('MEDIA_REGION'),
+          MediaPlacement(
+            dotenv.get('AUDIO_HOST_URL'),
+            dotenv.get('AUDIO_FALLBACK_URL'),
+            dotenv.get('SIGNALING_URL'),
+            dotenv.get('TURN_CONTROLLER_URL'),
+          ),
+        ),
+        AttendeeInfo(
+          dotenv.get('EXTERNAL_USER_ID'),
+          dotenv.get('ATTENDEE_ID'),
+          dotenv.get('JOIN_TOKEN'),
+        ),
+      ),
     );
-
-    // Check if ApiResponse is not null or returns a false response value indicating failed api call
-    if (!apiResponse.response) {
-      if (apiResponse.error != null) {
-        _createError(apiResponse.error!);
-        return false;
-      }
-    }
 
     // Set meeetingData in meetingProvider
     if (apiResponse.response && apiResponse.content != null) {
       meetingProvider.intializeMeetingData(apiResponse.content!);
     }
 
-    // Convert JoinInfo object to JSON
-    // if (meetingProvider.meetingData == null) {
-    //   _createError(Response.null_meeting_data);
-    //   return false;
-    // }
-
     final Map<String, dynamic> jsonArgsToSend = api.joinInfoToJSON(
       meetingProvider.meetingData!,
     );
 
     // Send JSON to iOS
-    MethodChannelResponse? joinResponse = await methodChannelProvider
-        .callMethod(MethodCallOption.join, jsonArgsToSend);
+    late final MethodChannelResponse? joinResponse;
+    joinResponse = await methodChannelProvider.callMethod(
+      MethodCallOption.join,
+      jsonArgsToSend,
+    );
 
     if (joinResponse == null) {
       _createError(Response.null_join_response);
@@ -121,7 +108,8 @@ class JoinMeetingViewModel extends ChangeNotifier {
   }
 
   Future<bool> _requestAudioPermissions(
-      MethodChannelCoordinator methodChannelProvider) async {
+    MethodChannelCoordinator methodChannelProvider,
+  ) async {
     MethodChannelResponse? audioPermission = await methodChannelProvider
         .callMethod(MethodCallOption.manageAudioPermissions);
     if (audioPermission == null) {
@@ -136,9 +124,14 @@ class JoinMeetingViewModel extends ChangeNotifier {
   }
 
   Future<bool> _requestVideoPermissions(
-      MethodChannelCoordinator methodChannelProvider) async {
-    MethodChannelResponse? videoPermission = await methodChannelProvider
-        .callMethod(MethodCallOption.manageVideoPermissions);
+    MethodChannelCoordinator methodChannelProvider,
+  ) async {
+    late final MethodChannelResponse? videoPermission;
+
+    videoPermission = await methodChannelProvider.callMethod(
+      MethodCallOption.manageVideoPermissions,
+    );
+
     if (videoPermission != null) {
       if (videoPermission.result) {
         logger.i(videoPermission.arguments);
@@ -147,6 +140,7 @@ class JoinMeetingViewModel extends ChangeNotifier {
       }
       return videoPermission.result;
     }
+
     return false;
   }
 
