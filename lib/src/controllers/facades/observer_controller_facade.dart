@@ -10,6 +10,12 @@ abstract class ObserverControllerFacade {
   RealtimeInterface? realtimeObserver;
   VideoTileInterface? videoTileObserver;
 
+  void initializeMethodCallHandler() {
+    throw UnimplementedError(
+      'initializeMethodCallHandler() has not been implemented',
+    );
+  }
+
   void initializeObservers(AwsChimeControllerFacade controller) {
     throw UnimplementedError(
       'initializeObservers(AwsChimeControllerFacade controller) has not been implemented',

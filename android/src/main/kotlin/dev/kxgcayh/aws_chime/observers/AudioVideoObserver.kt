@@ -10,9 +10,8 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.AudioVideoObserver
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.RemoteVideoSource
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatus
 import dev.kxgcayh.aws_chime.enums.MethodCallFlutter
-import dev.kxgcayh.aws_chime.AwsChimeCoordinator
 
-class AudioVideoObserver(val coordinator: AwsChimeCoordinator) : AudioVideoObserver {
+class AudioVideoObserver(val coordinator: AwsChimePlugin) : AudioVideoObserver {
     private val gson: Gson = Gson()
 
     override fun onAudioSessionStartedConnecting(reconnecting: Boolean) {

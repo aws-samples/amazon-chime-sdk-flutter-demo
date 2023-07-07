@@ -55,10 +55,4 @@ abstract class AwsChimePlatform extends PlatformInterface {
       'initialAudioSelection() has not been implemented',
     );
   }
-
-  Future<List<String>> listAudioDevice() async {
-    throw UnimplementedError(
-      'listAudioDevice() has not been implemented',
-    );
-  }
 }

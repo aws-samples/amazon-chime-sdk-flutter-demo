@@ -11,9 +11,8 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.SignalUpdate
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.VolumeUpdate
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.VolumeLevel
 import dev.kxgcayh.aws_chime.enums.MethodCallFlutter
-import dev.kxgcayh.aws_chime.AwsChimeCoordinator
 
-class RealtimeObserver(val coordinator: AwsChimeCoordinator) : RealtimeObserver {
+class RealtimeObserver(val coordinator: AwsChimePlugin) : RealtimeObserver {
 
     override fun onVolumeChanged(volumeUpdates: Array<VolumeUpdate>) {
         for (currentVolumeUpdate in volumeUpdates) {

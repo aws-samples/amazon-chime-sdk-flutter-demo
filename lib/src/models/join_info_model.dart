@@ -14,6 +14,21 @@ class JoinInfoModel {
     );
   }
 
+  Map<String, dynamic> toChannelJson() {
+    return {
+      "MeetingId": meeting.meetingId,
+      "ExternalMeetingId": meeting.externalMeetingId,
+      "MediaRegion": meeting.mediaRegion,
+      "AudioHostUrl": meeting.mediaPlacement.audioHostUrl,
+      "AudioFallbackUrl": meeting.mediaPlacement.audioFallbackUrl,
+      "SignalingUrl": meeting.mediaPlacement.signalingUrl,
+      "TurnControlUrl": meeting.mediaPlacement.turnControllerUrl,
+      "ExternalUserId": attendee.externalUserId,
+      "AttendeeId": attendee.attendeeId,
+      "JoinToken": attendee.joinToken
+    };
+  }
+
   @override
   String toString() => 'JoinInfo(meeting: $meeting, attendee: $attendee)';
 }

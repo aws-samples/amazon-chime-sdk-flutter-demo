@@ -9,9 +9,8 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoTileObser
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoTileState
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
 import dev.kxgcayh.aws_chime.enums.MethodCallFlutter
-import dev.kxgcayh.aws_chime.AwsChimeCoordinator
 
-class VideoTileObserver(val coordinator: AwsChimeCoordinator) : VideoTileObserver {
+class VideoTileObserver(val coordinator: AwsChimePlugin) : VideoTileObserver {
 
     private val videoTileObserverLogger: ConsoleLogger = ConsoleLogger()
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:aws_chime/src/constants/method_call_options.dart';
 import 'package:aws_chime/src/models/attendee_model.dart';
@@ -25,6 +26,9 @@ class MethodChannelAwsChime implements AwsChimePlatform {
 
   @override
   Future<void> methodCallHandler(MethodCall call) async {
+    log(
+      "Recieved method call ${call.method} with arguments: ${call.arguments}",
+    );
     switch (call.method) {
       case MethodCallOption.JOIN:
         observer.realtimeObserver?.attendeeDidJoin(
@@ -91,6 +95,7 @@ class MethodChannelAwsChime implements AwsChimePlatform {
 
   @override
   Future<MethodChannelResponse?> callMethod(String methodName, [args]) async {
+    log("Calling $methodName through method channel with args: $args");
     try {
       dynamic response = await methodChannel.invokeMethod(methodName, args);
       return MethodChannelResponse.fromJson(response);
@@ -113,20 +118,5 @@ class MethodChannelAwsChime implements AwsChimePlatform {
       MethodCallOption.INITIAL_AUDIO_SELECTION,
     );
     return device?.arguments as String?;
-  }
-
-  @override
-  Future<List<String>> listAudioDevice() async {
-    List<String> deviceList = <String>[];
-    MethodChannelResponse? response = await callMethod(
-      MethodCallOption.LIST_AUDIO_DEVICES,
-    );
-    if (response?.arguments != null) {
-      final iterables = response!.arguments.map((device) => device.toString());
-      for (final item in iterables) {
-        deviceList.add(item);
-      }
-    }
-    return deviceList;
   }
 }
