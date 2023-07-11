@@ -8,3 +8,5 @@ final observerProvider = ChangeNotifierProvider((ref) {
 final awsChimeProvider = ChangeNotifierProvider((ref) {
   return AwsChimeController();
 });
+
+final permissionProvider = Provider((ref) => PermissionController());

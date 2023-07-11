@@ -94,8 +94,7 @@ class MethodChannelAwsChime implements AwsChimePlatform {
   }
 
   @override
-  Future<MethodChannelResponse?> callMethod(String methodName, [args]) async {
-    log("Calling $methodName through method channel with args: $args");
+  Future<MethodChannelResponse> callMethod(String methodName, [args]) async {
     try {
       dynamic response = await methodChannel.invokeMethod(methodName, args);
       return MethodChannelResponse.fromJson(response);
@@ -117,6 +116,6 @@ class MethodChannelAwsChime implements AwsChimePlatform {
     MethodChannelResponse? device = await callMethod(
       MethodCallOption.INITIAL_AUDIO_SELECTION,
     );
-    return device?.arguments as String?;
+    return device.arguments as String?;
   }
 }

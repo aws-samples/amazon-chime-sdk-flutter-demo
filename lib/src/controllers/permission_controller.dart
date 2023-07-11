@@ -10,7 +10,7 @@ class PermissionController implements PermissionControllerFacade {
     final response = await _channel.callMethod(
       MethodCallOption.MANAGE_AUDIO_PERMISSIONS,
     );
-    return response?.result ?? false;
+    return response.result;
   }
 
   @override
@@ -18,6 +18,6 @@ class PermissionController implements PermissionControllerFacade {
     final response = await _channel.callMethod(
       MethodCallOption.MANAGE_VIDEO_PERMISSIONS,
     );
-    return response?.result ?? false;
+    return response.result;
   }
 }

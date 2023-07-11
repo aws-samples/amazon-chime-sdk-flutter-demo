@@ -1,8 +1,7 @@
 import 'dart:developer';
 
 import 'package:aws_chime/aws_chime.dart';
-import 'package:aws_chime/src/aws_chime_method_channel.dart';
-import 'package:aws_chime/src/aws_chime_platform_interface.dart';
+import 'package:aws_chime/src/controllers/aws_channel_controller.dart';
 import 'package:aws_chime/src/controllers/facades/aws_chime_controller_facade.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,10 +12,11 @@ class AwsChimeController extends ChangeNotifier
     if (dataSource != null) initializeMeetingData(dataSource);
   }
 
-  AwsChimePlatform get channel => MethodChannelAwsChime();
+  final AwsChannelController _channel = AwsChannelController();
 
   MeetingDataSource? dataSource;
   List<String> deviceList = <String>[];
+  String? selectedAudioDevice;
 
   void initializeMeetingData(MeetingDataSource meetingDataSource) {
     if (!isInitialized) {
@@ -26,14 +26,11 @@ class AwsChimeController extends ChangeNotifier
   }
 
   Future<bool> joinMeeting() async {
-    listAudioDevices();
     if (isInitialized) {
-      // final response = await channel.callMethod(
-      //   MethodCallOption.JOIN,
-      //   dataSource?.joinInfo.toChannelJson(),
-      // );
-
-      // if (response?.result == false) return false;
+      final response = await _channel.join(dataSource!.joinInfo);
+      if (!response) return false;
+      await listAudioDevices();
+      await initialAudioSelection();
     }
     return true;
   }
@@ -79,33 +76,18 @@ class AwsChimeController extends ChangeNotifier
   }
 
   @override
-  void initialAudioSelection() {
+  Future<void> initialAudioSelection() async {
     if (isInitialized) {
-      // TODO: implement initialAudioSelection
+      selectedAudioDevice = await _channel.initialAudio();
       notifyListeners();
     }
   }
 
   @override
-  void listAudioDevices() async {
+  Future<void> listAudioDevices() async {
     if (isInitialized) {
-      try {
-        List<String> deviceList = <String>[];
-        MethodChannelResponse? response = await channel.callMethod(
-          MethodCallOption.LIST_AUDIO_DEVICES,
-        );
-        if (response?.arguments != null) {
-          final iterables = response!.arguments.map(
-            (device) => device.toString(),
-          );
-          for (final item in iterables) {
-            deviceList.add(item);
-          }
-        }
-        notifyListeners();
-      } catch (e, s) {
-        log('ERROR: $e, $s');
-      }
+      deviceList = await _channel.getAudioDevices();
+      notifyListeners();
     }
   }
 
@@ -135,5 +117,11 @@ class AwsChimeController extends ChangeNotifier
 }
 
 extension AwsChimeControllerHelper on AwsChimeController {
-  bool get isInitialized => dataSource != null;
+  bool get isInitialized {
+    if (dataSource == null) {
+      log('Error: MeetingDataSource is not initialized');
+      return false;
+    }
+    return true;
+  }
 }

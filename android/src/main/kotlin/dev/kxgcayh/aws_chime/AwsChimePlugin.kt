@@ -18,6 +18,7 @@ import dev.kxgcayh.aws_chime.managers.PermissionManager
 import dev.kxgcayh.aws_chime.enums.MethodCallFlutter
 import android.util.Log
 import dev.kxgcayh.aws_chime.enums.ResponseEnum
+import android.content.Context
 import com.amazonaws.services.chime.sdk.meetings.session.DefaultMeetingSession
 import com.amazonaws.services.chime.sdk.meetings.session.MediaPlacement
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionConfiguration
@@ -29,7 +30,7 @@ import com.amazonaws.services.chime.sdk.meetings.device.MediaDevice
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
 
 /** AwsChimePlugin */
-class AwsChimePlugin: FlutterPlugin, ActivityAware, MethodCallHandler, FlutterActivity() {
+class AwsChimePlugin: FlutterPlugin, ActivityAware, MethodCallHandler {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -38,18 +39,17 @@ class AwsChimePlugin: FlutterPlugin, ActivityAware, MethodCallHandler, FlutterAc
   private lateinit var activity: Activity
   private lateinit var flutterEngine: FlutterEngine
   private lateinit var permissionsManager: PermissionManager
+  private lateinit var context: Context
+  // private lateinit var flutterState: FlutterState
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPluginBinding) {
-    Log.i(TAG, "1 -> onAttachedToEngine")
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "aws_chime")
     channel.setMethodCallHandler(this)
-    flutterEngine = flutterPluginBinding.flutterEngine
-    configureFlutterEngine(flutterEngine)
+    context = flutterPluginBinding.applicationContext
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    // Log.i(TAG, "Received MethodCall with method: ${call.method}")
-    var callResult: MethodChannelResult? = null
+    var callResult: MethodChannelResult = MethodChannelResult(false, ResponseEnum.METHOD_NOT_IMPLEMENTED)
     when (call.method) {
       MethodCallFlutter.GET_PLATFORM_VERSION -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
@@ -60,17 +60,24 @@ class AwsChimePlugin: FlutterPlugin, ActivityAware, MethodCallHandler, FlutterAc
       MethodCallFlutter.MANAGE_VIDEO_PERMISSIONS -> {
         permissionsManager.manageVideoPermissions(result)
       }
+      MethodCallFlutter.JOIN -> {
+        callResult = join(call)
+      }
       MethodCallFlutter.LIST_AUDIO_DEVICES -> {
         callResult = listAudioDevices()
-        Log.i(TAG, "Received MethodCall with method: $callResult")
-        result.success(callResult?.toFlutterCompatibleType())
       }
-      else -> result.notImplemented()
+      else -> callResult = MethodChannelResult(false, ResponseEnum.METHOD_NOT_IMPLEMENTED)
     }
-  }
 
-  fun callFlutterMethod(method: String, args: Any?) {
-    channel.invokeMethod(method, args)
+    if (callResult.result) {
+      result.success(callResult.toFlutterCompatibleType())
+    } else {
+      result.error(
+        "Failed",
+        "MethodChannelHandler failed",
+        callResult.toFlutterCompatibleType()
+      )
+    }
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -84,29 +91,8 @@ class AwsChimePlugin: FlutterPlugin, ActivityAware, MethodCallHandler, FlutterAc
     channel.setMethodCallHandler(null)
   }
 
-  override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-    Log.i(TAG, "4 -> configureFlutterEngine")
-    super.configureFlutterEngine(flutterEngine)
-
-    flutterEngine
-      .platformViewsController
-      .registry
-      .registerViewFactory("videoTile", NativeViewFactory())
-  }
-
-  override fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissionsList: Array<String>,
-    grantResults: IntArray
-  ) {
-    when (requestCode) {
-      permissionsManager.AUDIO_PERMISSION_REQUEST_CODE -> {
-        permissionsManager.audioCallbackReceived()
-      }
-      permissionsManager.VIDEO_PERMISSION_REQUEST_CODE -> {
-        permissionsManager.videoCallbackReceived()
-      }
-    }
+  fun callFlutterMethod(method: String, args: Any?) {
+    channel.invokeMethod(method, args)
   }
 
   override fun onDetachedFromActivity() {}

@@ -41,7 +41,7 @@ abstract class AwsChimePlatform extends PlatformInterface {
     );
   }
 
-  Future<MethodChannelResponse?> callMethod(
+  Future<MethodChannelResponse> callMethod(
     String methodName, [
     dynamic args,
   ]) async {
