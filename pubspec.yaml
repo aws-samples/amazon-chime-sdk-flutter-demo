@@ -1,4 +1,4 @@
-name: aws_chime
+name: amazon_realtime
 description: A new Flutter plugin project.
 version: 0.0.1
 homepage:
@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  logger: ^1.4.0
+  permission_handler: ^10.4.3
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:
@@ -35,10 +37,10 @@ flutter:
   plugin:
     platforms:
       android:
-        package: dev.kxgcayh.aws_chime
-        pluginClass: AwsChimePlugin
+        package: dev.kxgcayh.amazon.realtime
+        pluginClass: AmazonRealtimePlugin
       ios:
-        pluginClass: AwsChimePlugin
+        pluginClass: AmazonRealtimePlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

@@ -1,10 +1,6 @@
 include: package:flutter_lints/flutter.yaml
-
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
 linter:
   rules:
-    prefer_const_constructors: false
-    prefer_const_literals_to_create_immutables: false
-    non_constant_identifier_names: false
     constant_identifier_names: false
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options

@@ -1,6 +1,6 @@
-# aws_chime_example
+# amazon_realtime_example
 
-Demonstrates how to use the aws_chime plugin.
+Demonstrates how to use the amazon_realtime plugin.
 
 ## Getting Started
 

@@ -1,4 +1,4 @@
-# aws_chime
+# amazon_realtime
 
 A new Flutter plugin project.
 
